@@ -18,17 +18,22 @@ import edu.wpi.first.wpilibj2.command.Commands;
 
 public class Shooter extends SubsystemBase {
   /** Creates a new ShooterShoot. */
+
+  // ID 13 is the inner motor(The one on the back.), ID 17 is the outer motor (The one on the front.)
+  // Both are connected to the CAN bus
+
   private final TalonFX inner = new TalonFX(13, "CANivore");
   private final TalonFX outer = new TalonFX(17, "CANivore");
   private final VelocityVoltage vv = new VelocityVoltage(0).withSlot(0);
 
+  // These are static and final, meaning they are constants for this class.
   private static final double kP = 0.1;
   private static final double kI = 0.0;
   private static final double kD = 0.0;
 
   private static final double kS = 0.1;
   private static final double kV = 0.0;
-  
+  //Configure the TalonFX motors.
   public Shooter() {
     inner.getConfigurator().apply(new TalonFXConfiguration(){{
         Slot0.kP = kP;
@@ -44,15 +49,17 @@ public class Shooter extends SubsystemBase {
       MotorOutput.NeutralMode = NeutralModeValue.Brake;
     }});
   }
-
+  // The outer wheel spins in the negative direction
+  // The inner wheel spins in the positive direction
   VelocityVoltage outerVelocity = new VelocityVoltage(-Constants.shooterSpeed);
   VelocityVoltage innerVelocity = new VelocityVoltage(Constants.shooterSpeed);
 
   public void startWheels(){
+    // Send the velocity control request to each motor
     inner.setControl(innerVelocity);
     outer.setControl(outerVelocity);
   }
-
+  // Stop the wheels from spinning.
   public void stopWheels(){
     inner.set(0);
     outer.set(0);
