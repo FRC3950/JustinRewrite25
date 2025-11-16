@@ -7,4 +7,6 @@ package frc.robot;
 /** Add your docs here. */
 public class Constants {
     public static double shooterSpeed = 70;
+    public static double intakeSpeed = 0.50;
+    public static double indexerSpeed = 0.40;
 }
