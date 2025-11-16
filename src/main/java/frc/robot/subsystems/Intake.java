@@ -67,5 +67,5 @@ public class Intake extends SubsystemBase {
       return Commands.none();
     }
   }
-  
+
 }

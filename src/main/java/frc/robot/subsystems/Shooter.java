@@ -20,12 +20,12 @@ public class Shooter extends SubsystemBase {
   private final TalonFX outer = new TalonFX(17, "CANivore");
   private final VelocityVoltage vv = new VelocityVoltage(0).withSlot(0);
 
-  private static final double kP = 0.1;
+  private static final double kP = 0.2;
   private static final double kI = 0.0;
-  private static final double kD = 0.0;
+  private static final double kD = 0.01;
 
   private static final double kS = 0.1;
-  private static final double kV = 0.0;
+  private static final double kV = 0.12;
   
   public Shooter() {
     inner.getConfigurator().apply(new TalonFXConfiguration(){{
