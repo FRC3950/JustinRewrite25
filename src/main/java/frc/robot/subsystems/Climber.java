@@ -25,7 +25,6 @@ public class Climber extends SubsystemBase {
   public Climber() {
     climberL.setNeutralMode(NeutralModeValue.Brake);
     climberR.setNeutralMode(NeutralModeValue.Brake);
-    zeroIfAtBottom();
   }
 
   public double getPositionL() {
@@ -37,20 +36,11 @@ public class Climber extends SubsystemBase {
   }
 
   public boolean isBottomL() {
-    return climberL.getReverseLimit().getValue().equals(ReverseLimitValue.ClosedToGround);
+    return climberL.getReverseLimit().getValue().equals(ReverseLimitValue.Open);
   }
 
   public boolean isBottomR() {
-    return climberR.getReverseLimit().getValue().equals(ReverseLimitValue.ClosedToGround);
-  }
-
-  private void zeroIfAtBottom() {
-    if (isBottomL()) {
-      climberL.setPosition(0.0);
-    }
-    if (isBottomR()) {
-      climberR.setPosition(0.0);
-    }
+    return climberR.getReverseLimit().getValue().equals(ReverseLimitValue.Open);
   }
 
   private void runClimbers(boolean goingUp) {
@@ -95,10 +85,5 @@ public class Climber extends SubsystemBase {
 
   public Command Down() {
     return this.run(() -> runClimbers(false));
-  }
-
-  @Override
-  public void periodic() {
-    zeroIfAtBottom();
   }
 }

@@ -16,14 +16,14 @@ import frc.robot.Constants;
 
 public class Flipper extends SubsystemBase {
 
-  private final TalonFX flipper = new TalonFX(31);
+  private final TalonFX flipper = new TalonFX(31, "rio");
   private final PositionVoltage positionRequest = new PositionVoltage(0).withSlot(0);
 
   public Flipper() {
     TalonFXConfiguration cfg = new TalonFXConfiguration();
-    cfg.Slot0.kP = 20.0;
+    cfg.Slot0.kP = 0.5;
     cfg.Slot0.kI = 0;
-    cfg.Slot0.kD = 0.2;
+    cfg.Slot0.kD = 0.01;
     cfg.Slot0.kS = 0;
     cfg.Slot0.kV = 0;
     cfg.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -31,7 +31,6 @@ public class Flipper extends SubsystemBase {
     flipper.getConfigurator().apply(cfg);
 
     // Optional: assume we start at stow when we boot
-    flipper.setPosition(Constants.flipperStowPos);
   }
 
   /** Hold at the stow position. */
