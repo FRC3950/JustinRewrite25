@@ -32,6 +32,8 @@ public class Shooter extends SubsystemBase {
         Slot0.kP = kP;
         Slot0.kI = kI;
         Slot0.kD = kD;
+        Slot0.kS = kS;
+        Slot0.kV = kV;
         MotorOutput.NeutralMode = NeutralModeValue.Brake;
     }});
 
@@ -39,6 +41,8 @@ public class Shooter extends SubsystemBase {
       Slot0.kP = kP;
       Slot0.kI = kI;
       Slot0.kD = kD;
+      Slot0.kS = kS;
+      Slot0.kV = kV;
       MotorOutput.NeutralMode = NeutralModeValue.Brake;
     }});
   }
