@@ -16,12 +16,12 @@ import frc.robot.Constants;
 
 public class Flipper extends SubsystemBase {
 
-  private final TalonFX flipper = new TalonFX(31, "rio");
+  private final TalonFX flipper = new TalonFX(31, "CANivore");
   private final PositionVoltage positionRequest = new PositionVoltage(0).withSlot(0);
 
   public Flipper() {
     TalonFXConfiguration cfg = new TalonFXConfiguration();
-    cfg.Slot0.kP = 0.5;
+    cfg.Slot0.kP = 2.5;
     cfg.Slot0.kI = 0;
     cfg.Slot0.kD = 0.01;
     cfg.Slot0.kS = 0;
