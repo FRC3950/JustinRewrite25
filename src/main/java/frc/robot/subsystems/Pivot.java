@@ -19,9 +19,12 @@ public class Pivot extends SubsystemBase {
     pivot.setControl(mm_request.withPosition(angleToPos(Constants.pivotShootAngle)));
   }
   public void pivotDown(){
-    pivot.se
+    pivot.setControl(mm_request.withPosition((Constants.pivotStowPosition)));
   }
   public double angleToPos(double angle){
     return angle/2.1;
+  }
+  public void stow(){
+    pivot.setControl(mm_request.withPosition(angleToPos(Constants.pivotStowPosition)));
   }
 }
