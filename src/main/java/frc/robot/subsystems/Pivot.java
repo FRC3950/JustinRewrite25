@@ -4,27 +4,52 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import java.util.function.BooleanSupplier;
+
 import com.ctre.phoenix6.controls.DynamicMotionMagicVoltage;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.ReverseLimitValue;
+
 import frc.robot.Constants;
 
 public class Pivot extends SubsystemBase {
-  private final TalonFX pivot = new TalonFX(15, "CANivore");
+  private static final TalonFX pivot = new TalonFX(15, "CANivore");
   private final DynamicMotionMagicVoltage mm_request = new DynamicMotionMagicVoltage(0, 130, 260, 0);
+  private final PositionVoltage pos = new PositionVoltage(0);
   public Pivot() {
   }
   public void pivotUp(){
     pivot.setControl(mm_request.withPosition(angleToPos(Constants.pivotShootAngle)));
   }
   public void pivotDown(){
-    pivot.setControl(mm_request.withPosition((Constants.pivotStowPosition)));
+    pivot.setControl(mm_request.withPosition((0)));
   }
   public double angleToPos(double angle){
-    return angle/2.1;
+    return angle/Constants.pivotOffsetAngleThingy;
   }
   public void stow(){
-    pivot.setControl(mm_request.withPosition(angleToPos(Constants.pivotStowPosition)));
+    pivot.setControl(pos.withPosition(Constants.pivotStowPosition));
+  }
+  public static BooleanSupplier pivotZero(){
+    return () -> pivot.getReverseLimit().getValue().equals(ReverseLimitValue.ClosedToGround);
+  }
+  public static Command zeroEncoder(){
+    return new InstantCommand(
+      () -> pivot.setPosition(0)
+    );
+  }
+  public Command pivotStartEnd(){
+    return new StartEndCommand(this::pivotUp, this::pivotDown, this);
+  }
+  public Command stowDefault(){
+    return Commands.run(this::stow, this);
   }
 }

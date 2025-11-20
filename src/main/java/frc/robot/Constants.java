@@ -14,6 +14,6 @@ public class Constants {
     public final static double flipperAmpPos = 0; //rotations
     public final static double flipperStowPos = 0.65; //rotations
     public static double pivotShootAngle = 45; //0-160ish
-    public static double pivotStowPosition = -0.05; //not an angle. up to like 30 idk
-    public static double pivotOffsetAngleThingy = 0; //calibration offset
+    public static double pivotStowPosition = -1.5; //position
+    public static double pivotOffsetAngleThingy = 2.2949635; //calibration offset
 }

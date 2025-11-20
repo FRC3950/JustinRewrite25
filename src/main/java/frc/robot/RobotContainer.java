@@ -18,12 +18,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Pivot;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Flipper;
 
@@ -49,11 +51,16 @@ public class RobotContainer {
     public final Intake intake = new Intake();
     public final Climber climber = new Climber();
     public final Flipper flipper = new Flipper();
+    public final Pivot pivot = new Pivot();
+    
+    
 
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
+    Trigger zeroPivot = new Trigger(Pivot.pivotZero());
 
     public RobotContainer() {
+        zeroPivot.onTrue(Pivot.zeroEncoder());
         autoChooser = AutoBuilder.buildAutoChooser("Tests");
         SmartDashboard.putData("Auto Mode", autoChooser);
 
@@ -67,6 +74,7 @@ public class RobotContainer {
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
         flipper.setDefaultCommand(flipper.holdStowCommand());
+        pivot.setDefaultCommand(pivot.stowDefault());
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
@@ -93,7 +101,7 @@ public class RobotContainer {
         // reset the field-centric heading on left bumper press
         joystick.y().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
         // flywheel control for now
-        joystick.leftBumper().whileTrue(shooter.shoot_StartStop());
+        joystick.leftBumper().whileTrue(pivot.pivotStartEnd().alongWith(shooter.shoot_StartStop()));
         //intake
         joystick.a().whileTrue(intake.intakeCommand());
         //outake/reverse intake if note stuck
