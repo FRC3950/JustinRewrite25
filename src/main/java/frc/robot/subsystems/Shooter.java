@@ -26,41 +26,45 @@ public class Shooter extends SubsystemBase {
 
   private static final double kS = 0.1;
   private static final double kV = 0.12;
-  
+
   public Shooter() {
-    inner.getConfigurator().apply(new TalonFXConfiguration(){{
+    inner.getConfigurator().apply(new TalonFXConfiguration() {
+      {
         Slot0.kP = kP;
         Slot0.kI = kI;
         Slot0.kD = kD;
         Slot0.kS = kS;
         Slot0.kV = kV;
         MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    }});
+      }
+    });
 
-    outer.getConfigurator().apply(new TalonFXConfiguration(){{
-      Slot0.kP = kP;
-      Slot0.kI = kI;
-      Slot0.kD = kD;
-      Slot0.kS = kS;
-      Slot0.kV = kV;
-      MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    }});
+    outer.getConfigurator().apply(new TalonFXConfiguration() {
+      {
+        Slot0.kP = kP;
+        Slot0.kI = kI;
+        Slot0.kD = kD;
+        Slot0.kS = kS;
+        Slot0.kV = kV;
+        MotorOutput.NeutralMode = NeutralModeValue.Brake;
+      }
+    });
   }
 
   VelocityVoltage outerVelocity = new VelocityVoltage(-Constants.shooterSpeed);
   VelocityVoltage innerVelocity = new VelocityVoltage(Constants.shooterSpeed);
 
-  public void startWheels(){
-    inner.setControl(innerVelocity);
-    outer.setControl(outerVelocity);
+  public void startWheels() {
+    inner.setControl(innerVelocity.withVelocity(Constants.shooterSpeed));
+    outer.setControl(outerVelocity.withVelocity(-Constants.shooterSpeed));
   }
 
-  public void stopWheels(){
+  public void stopWheels() {
     inner.set(0);
     outer.set(0);
   }
 
-  public Command shoot_StartStop(){
+  public Command shoot_StartStop() {
     return Commands.startEnd(this::startWheels, this::stopWheels, this);
   }
 }
