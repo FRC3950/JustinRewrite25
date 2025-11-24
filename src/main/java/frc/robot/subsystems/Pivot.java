@@ -7,16 +7,16 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import java.util.function.BooleanSupplier;
 
 import com.ctre.phoenix6.controls.DynamicMotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
-import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
+
+import static edu.wpi.first.units.Units.Rotations;
 
 import frc.robot.Constants;
 
@@ -24,32 +24,46 @@ public class Pivot extends SubsystemBase {
   private static final TalonFX pivot = new TalonFX(15, "CANivore");
   private final DynamicMotionMagicVoltage mm_request = new DynamicMotionMagicVoltage(0, 130, 260, 0);
   private final PositionVoltage pos = new PositionVoltage(0);
+
   public Pivot() {
   }
-  public void pivotUp(){
-    pivot.setControl(mm_request.withPosition(angleToPos(Constants.pivotShootAngle)));
+
+  private double getFeedForward() {
+    double currentPos = pivot.getPosition().getValue().in(Rotations);
+    double currentAngle = currentPos * Constants.pivotOffsetAngleThingy;
+    return 0.2 * Math.sin(Math.toRadians(currentAngle));
   }
-  public void pivotDown(){
-    pivot.setControl(mm_request.withPosition((0)));
+
+  public void pivotUp() {
+    pivot.setControl(mm_request.withPosition(angleToPos(Constants.pivotShootAngle)).withFeedForward(getFeedForward()));
   }
-  public double angleToPos(double angle){
-    return angle/Constants.pivotOffsetAngleThingy;
+
+  public void pivotDown() {
+    pivot.setControl(mm_request.withPosition(0).withFeedForward(getFeedForward()));
   }
-  public void stow(){
-    pivot.setControl(pos.withPosition(Constants.pivotStowPosition));
+
+  public double angleToPos(double angle) {
+    return angle / Constants.pivotOffsetAngleThingy;
   }
-  public static BooleanSupplier pivotZero(){
+
+  public void stow() {
+    pivot.setControl(pos.withPosition(Constants.pivotStowPosition).withFeedForward(getFeedForward()));
+  }
+
+  public static BooleanSupplier pivotZero() {
     return () -> pivot.getReverseLimit().getValue().equals(ReverseLimitValue.ClosedToGround);
   }
-  public static Command zeroEncoder(){
+
+  public static Command zeroEncoder() {
     return new InstantCommand(
-      () -> pivot.setPosition(0)
-    );
+        () -> pivot.setPosition(0));
   }
-  public Command pivotStartEnd(){
-    return new StartEndCommand(this::pivotUp, this::pivotDown, this);
+
+  public Command pivotStartEnd() {
+    return Commands.runEnd(this::pivotUp, this::pivotDown, this);
   }
-  public Command stowDefault(){
+
+  public Command stowDefault() {
     return Commands.run(this::stow, this);
   }
 }
