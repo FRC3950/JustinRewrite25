@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -37,11 +39,11 @@ public class Climber extends SubsystemBase {
   }
 
   public boolean isBottomL() {
-    return climberL.getReverseLimit().getValue().equals(ReverseLimitValue.Open);
+    return climberL.getReverseLimit().getValue().equals(ReverseLimitValue.ClosedToGround);
   }
 
   public boolean isBottomR() {
-    return climberR.getReverseLimit().getValue().equals(ReverseLimitValue.Open);
+    return climberR.getReverseLimit().getValue().equals(ReverseLimitValue.ClosedToGround);
   }
 
   public void stop() {
@@ -50,6 +52,11 @@ public class Climber extends SubsystemBase {
   }
 
   public void move(double speed) {
+    SmartDashboard.putNumber("Climber L Pos", getPositionL());
+    SmartDashboard.putNumber("Climber R Pos", getPositionR());
+    SmartDashboard.putBoolean("Climber L Limit", isBottomL());
+    SmartDashboard.putBoolean("Climber R Limit", isBottomR());
+
     // Left Climber Logic
     if (speed > 0) { // Going Up
       if (getPositionL() >= Constants.climberMaxHeight - offset) {
