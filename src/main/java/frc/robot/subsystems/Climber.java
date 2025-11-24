@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
 
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -20,7 +21,7 @@ public class Climber extends SubsystemBase {
 
   private final DutyCycleOut climberOut = new DutyCycleOut(Constants.climberSpeed);
 
-  private static final double offset = 0.1; //needs tuning
+  private static final double offset = 0.1; // needs tuning
 
   public Climber() {
     climberL.setNeutralMode(NeutralModeValue.Brake);
@@ -43,47 +44,48 @@ public class Climber extends SubsystemBase {
     return climberR.getReverseLimit().getValue().equals(ReverseLimitValue.Open);
   }
 
-  private void runClimbers(boolean goingUp) {
+  public void stop() {
+    climberL.stopMotor();
+    climberR.stopMotor();
+  }
 
-    double posL = getPositionL();
-    double posR = getPositionR();
-
-    boolean bottomL = isBottomL();
-    boolean bottomR = isBottomR();
-
-    if (!goingUp) {
-      if (bottomL) {
+  public void move(double speed) {
+    // Left Climber Logic
+    if (speed > 0) { // Going Up
+      if (getPositionL() >= Constants.climberMaxHeight - offset) {
         climberL.stopMotor();
       } else {
-        climberL.setControl(climberOut.withOutput(-Constants.climberSpeed));
+        climberL.setControl(climberOut.withOutput(speed));
       }
+    } else { // Going Down
+      if (isBottomL()) {
+        climberL.stopMotor();
+      } else {
+        climberL.setControl(climberOut.withOutput(speed));
+      }
+    }
 
-      if (bottomR) {
+    // Right Climber Logic
+    if (speed > 0) { // Going Up
+      if (getPositionR() >= Constants.climberMaxHeight - offset) {
         climberR.stopMotor();
       } else {
-        climberR.setControl(climberOut.withOutput(-Constants.climberSpeed));
+        climberR.setControl(climberOut.withOutput(speed));
       }
-      return;
-    }
-
-    if (posL >= Constants.climberMaxHeight - offset) {
-      climberL.stopMotor();
-    } else {
-      climberL.setControl(climberOut);
-    }
-
-    if (posR >= Constants.climberMaxHeight - offset) {
-      climberR.stopMotor();
-    } else {
-      climberR.setControl(climberOut);
+    } else { // Going Down
+      if (isBottomR()) {
+        climberR.stopMotor();
+      } else {
+        climberR.setControl(climberOut.withOutput(speed));
+      }
     }
   }
 
   public Command Up() {
-    return this.run(() -> runClimbers(true));
+    return Commands.runEnd(() -> move(Constants.climberSpeed), this::stop, this);
   }
 
   public Command Down() {
-    return this.run(() -> runClimbers(false));
+    return Commands.runEnd(() -> move(-Constants.climberSpeed), this::stop, this);
   }
 }
