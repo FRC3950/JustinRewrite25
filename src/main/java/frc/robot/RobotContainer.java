@@ -12,7 +12,6 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -21,6 +20,10 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.HttpCamera;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -140,6 +143,44 @@ public class RobotContainer {
                     listener.lastDrive = driveChooser.getSelected();
                     SmartDashboard.putNumber("Drivetrain Max Speed", listener.lastDrive);
                 }).ignoringDisable(true));
+
+        // Limelight Streams
+        HttpCamera limelightFeed = new HttpCamera("Limelight Front Stream", "http://limelight.local:5800/stream.mjpg");
+        CameraServer.addCamera(limelightFeed);
+
+        HttpCamera limelightBackFeed = new HttpCamera("Limelight Back Stream",
+                "http://limelight-back.local:5800/stream.mjpg");
+        CameraServer.addCamera(limelightBackFeed);
+
+        SmartDashboard.putData("Swerve Visualizer", new Sendable() {
+            @Override
+            public void initSendable(SendableBuilder builder) {
+                builder.setSmartDashboardType("SwerveDrive");
+
+                builder.addDoubleProperty("Front Left Angle",
+                        () -> drivetrain.getState().ModuleStates[0].angle.getRadians(), null);
+                builder.addDoubleProperty("Front Left Velocity",
+                        () -> drivetrain.getState().ModuleStates[0].speedMetersPerSecond, null);
+
+                builder.addDoubleProperty("Front Right Angle",
+                        () -> drivetrain.getState().ModuleStates[1].angle.getRadians(), null);
+                builder.addDoubleProperty("Front Right Velocity",
+                        () -> drivetrain.getState().ModuleStates[1].speedMetersPerSecond, null);
+
+                builder.addDoubleProperty("Back Left Angle",
+                        () -> drivetrain.getState().ModuleStates[2].angle.getRadians(), null);
+                builder.addDoubleProperty("Back Left Velocity",
+                        () -> drivetrain.getState().ModuleStates[2].speedMetersPerSecond, null);
+
+                builder.addDoubleProperty("Back Right Angle",
+                        () -> drivetrain.getState().ModuleStates[3].angle.getRadians(), null);
+                builder.addDoubleProperty("Back Right Velocity",
+                        () -> drivetrain.getState().ModuleStates[3].speedMetersPerSecond, null);
+
+                builder.addDoubleProperty("Robot Angle", () -> drivetrain.getState().Pose.getRotation().getRadians(),
+                        null);
+            }
+        });
     }
 
     private void configureBindings() {
