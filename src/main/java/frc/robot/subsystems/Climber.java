@@ -23,7 +23,7 @@ public class Climber extends SubsystemBase {
 
   private final DutyCycleOut climberOut = new DutyCycleOut(Constants.climberSpeed);
 
-  private static final double offset = 0.1; // needs tuning
+  private static final double offset = 5; // needs tuning
 
   public Climber() {
     climberL.setNeutralMode(NeutralModeValue.Brake);
