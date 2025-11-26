@@ -60,7 +60,7 @@ public class Pivot extends SubsystemBase {
   }
 
   public Command pivotStartEnd() {
-    return Commands.runEnd(this::pivotUp, this::pivotDown, this);
+    return Commands.run(this::pivotUp, this);
   }
 
   public Command stowDefault() {
