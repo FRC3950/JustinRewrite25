@@ -68,31 +68,40 @@ public class StartupMusicCommand extends Command {
 
     @Override
     public void initialize() {
+        System.out.println("StartupMusicCommand: Initializing...");
+
         // Disable boot beep for all motors
         AudioConfigs audioConfigs = new AudioConfigs();
         audioConfigs.BeepOnBoot = false;
 
         for (TalonFX motor : motors) {
             motor.getConfigurator().apply(audioConfigs);
+            System.out.println("Added motor ID " + motor.getDeviceID() + " on bus: " + motor.getNetwork());
         }
 
         // Load and play music
         // Expects file in deploy directory (usually /home/lvuser/deploy)
         File deployDir = Filesystem.getDeployDirectory();
         File musicFile = new File(deployDir, "clash.chrp");
+        System.out.println("StartupMusicCommand: Loading music from " + musicFile.getAbsolutePath());
+
         var status = orchestra.loadMusic(musicFile.getAbsolutePath());
         if (!status.isOK()) {
-            System.out.println("StartupMusicCommand: Failed to load music file '" + musicFile.getAbsolutePath()
-                    + "'. Status: " + status);
+            System.out.println("StartupMusicCommand: Failed to load music file. Status: " + status);
         } else {
+            System.out.println("StartupMusicCommand: Music loaded successfully. Starting playback.");
             orchestra.play();
         }
     }
 
     @Override
     public void execute() {
-        if (!orchestra.isPlaying()) {
+        boolean playing = orchestra.isPlaying();
+        // System.out.println("StartupMusicCommand: Playing status: " + playing + "
+        // Time: " + orchestra.getCurrentTime());
+        if (!playing) {
             isFinished = true;
+            System.out.println("StartupMusicCommand: Music finished.");
         }
     }
 
@@ -103,6 +112,7 @@ public class StartupMusicCommand extends Command {
 
     @Override
     public void end(boolean interrupted) {
+        System.out.println("StartupMusicCommand: Ending. Interrupted: " + interrupted);
         orchestra.stop();
         // Clear instruments to release motors
         orchestra.clearInstruments();
