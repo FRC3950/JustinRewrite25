@@ -6,6 +6,8 @@ import com.ctre.phoenix6.configs.AudioConfigs;
 import com.ctre.phoenix6.hardware.TalonFX;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.File;
+import edu.wpi.first.wpilibj.Filesystem;
 
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -75,10 +77,13 @@ public class StartupMusicCommand extends Command {
         }
 
         // Load and play music
-        String musicFile = "clash.chrp"; // Expects file in working directory (usually /home/lvuser)
-        var status = orchestra.loadMusic(musicFile);
+        // Expects file in deploy directory (usually /home/lvuser/deploy)
+        File deployDir = Filesystem.getDeployDirectory();
+        File musicFile = new File(deployDir, "clash.chrp");
+        var status = orchestra.loadMusic(musicFile.getAbsolutePath());
         if (!status.isOK()) {
-            System.out.println("StartupMusicCommand: Failed to load music file '" + musicFile + "'. Status: " + status);
+            System.out.println("StartupMusicCommand: Failed to load music file '" + musicFile.getAbsolutePath()
+                    + "'. Status: " + status);
         } else {
             orchestra.play();
         }
