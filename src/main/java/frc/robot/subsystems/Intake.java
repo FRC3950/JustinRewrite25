@@ -11,7 +11,7 @@ import com.ctre.phoenix6.controls.Follower;
 import frc.robot.Constants;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;                                                                                                                   
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 
 public class Intake extends SubsystemBase {
@@ -23,21 +23,21 @@ public class Intake extends SubsystemBase {
     intake2.setControl(new Follower(intake.getDeviceID(), false));
   }
 
-  public void startIntake(){
+  public void startIntake() {
     intake.set(Constants.intakeSpeed);
     indexer.set(Constants.indexerSpeed);
   }
 
-  public void reverse(){
+  public void reverse() {
     intake.set(-Constants.intakeSpeed);
     indexer.set(-Constants.indexerSpeed);
   }
 
-  public void runIndexer(){
+  public void runIndexer() {
     indexer.set(Constants.indexerSpeed);
   }
 
-  public void stopIntake(){
+  public void stopIntake() {
     intake.set(0);
     indexer.set(0);
   }
@@ -46,28 +46,41 @@ public class Intake extends SubsystemBase {
     return !indexer.getReverseLimit().getValue().equals(ReverseLimitValue.Open);
   }
 
-  //Intakes until the condition of has a note.
+  // Intakes until the condition of has a note.
   public Command intakeCommand() {
     return new FunctionalCommand(
-      () -> {},
-      () -> startIntake(),
-      interrupted -> stopIntake(),
-      () -> hasNote(),
-      this
-    );
+        () -> {
+        },
+        () -> startIntake(),
+        interrupted -> stopIntake(),
+        () -> hasNote(),
+        this);
   }
 
   public Command reverseCommand() {
     return Commands.startEnd(this::reverse, this::stopIntake, this);
   }
-  //Command instantly finishes if there isn't a note, as intended :)
-  public Command indexer(){
+
+  // Command instantly finishes if there isn't a note, as intended :)
+  public Command indexer() {
     return new FunctionalCommand(
-      () -> {},
-      () -> runIndexer(),
-      interrupted -> stopIntake(),
-      () -> !hasNote(),
-      this
-    );
+        () -> {
+        },
+        () -> runIndexer(),
+        interrupted -> stopIntake(),
+        () -> !hasNote(),
+        this);
+  }
+
+  public TalonFX getIndexerMotor() {
+    return indexer;
+  }
+
+  public TalonFX getIntakeMotor() {
+    return intake;
+  }
+
+  public TalonFX getIntake2Motor() {
+    return intake2;
   }
 }

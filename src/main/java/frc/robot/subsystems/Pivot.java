@@ -66,4 +66,8 @@ public class Pivot extends SubsystemBase {
   public Command stowDefault() {
     return Commands.run(this::stow, this);
   }
+
+  public static TalonFX getMotor() {
+    return pivot;
+  }
 }

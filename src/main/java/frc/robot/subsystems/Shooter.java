@@ -67,4 +67,12 @@ public class Shooter extends SubsystemBase {
   public Command shoot_StartStop() {
     return Commands.startEnd(this::startWheels, this::stopWheels, this);
   }
+
+  public TalonFX getInnerMotor() {
+    return inner;
+  }
+
+  public TalonFX getOuterMotor() {
+    return outer;
+  }
 }

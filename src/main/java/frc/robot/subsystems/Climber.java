@@ -95,4 +95,12 @@ public class Climber extends SubsystemBase {
   public Command Down() {
     return Commands.runEnd(() -> move(-Constants.climberSpeed), this::stop, this);
   }
+
+  public TalonFX getLeftMotor() {
+    return climberL;
+  }
+
+  public TalonFX getRightMotor() {
+    return climberR;
+  }
 }

@@ -52,4 +52,8 @@ public class Flipper extends SubsystemBase {
   public Command holdAmpCommand() {
     return this.run(this::goToAmp);
   }
+
+  public TalonFX getMotor() {
+    return flipper;
+  }
 }
