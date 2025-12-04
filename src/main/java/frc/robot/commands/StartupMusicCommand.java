@@ -56,14 +56,8 @@ public class StartupMusicCommand extends Command {
             orchestra.addInstrument(motor);
         }
 
-        // We do not require subsystems because we are just using their motors for sound
-        // and this runs when disabled/initializing.
-        // However, if we wanted to be safe, we could require them, but that might block
-        // other default commands.
-        // Since this is for startup/disabled, it's safer to NOT require them to avoid
-        // conflict
-        // with default commands that might try to run (though usually they don't run in
-        // disabled).
+        // Require subsystems to ensure exclusive access and proper initialization
+        addRequirements(drivetrain, shooter, pivot, climber, intake, flipper);
     }
 
     @Override
@@ -97,8 +91,6 @@ public class StartupMusicCommand extends Command {
     @Override
     public void execute() {
         boolean playing = orchestra.isPlaying();
-        // System.out.println("StartupMusicCommand: Playing status: " + playing + "
-        // Time: " + orchestra.getCurrentTime());
         if (!playing) {
             isFinished = true;
             System.out.println("StartupMusicCommand: Music finished.");

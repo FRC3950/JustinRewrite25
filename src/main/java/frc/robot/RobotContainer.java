@@ -147,7 +147,6 @@ public class RobotContainer {
 
                 // Schedule startup music
                 new StartupMusicCommand(drivetrain, shooter, pivot, climber, intake, flipper).schedule();
-
         }
 
         private void configureBindings() {
