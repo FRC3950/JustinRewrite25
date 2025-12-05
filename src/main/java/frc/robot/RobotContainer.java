@@ -28,7 +28,6 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Pivot;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Flipper;
-import frc.robot.commands.StartupMusicCommand;
 
 public class RobotContainer {
         // MaxSpeed removed, using Constants.drivetrainMaxSpeed
@@ -146,7 +145,6 @@ public class RobotContainer {
                                 }).ignoringDisable(true));
 
                 // Schedule startup music
-                new StartupMusicCommand(drivetrain, shooter, pivot, climber, intake, flipper).schedule();
         }
 
         private void configureBindings() {
