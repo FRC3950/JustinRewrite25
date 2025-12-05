@@ -23,19 +23,22 @@ public class Climber extends SubsystemBase {
   private final MotionMagicVoltage mmReq = new MotionMagicVoltage(0).withSlot(0);
   private final PositionVoltage holdReq = new PositionVoltage(0).withSlot(0);
 
+  private static final double offset = 5; // Safety offset
+
   public Climber() {
     TalonFXConfiguration cfg = new TalonFXConfiguration();
 
     // PID and Feedforward
-    cfg.Slot0.kP = 1.0;
+    // PID and Feedforward
+    cfg.Slot0.kP = 0.5; // Less aggressive than original 1.0
     cfg.Slot0.kI = 0.0;
     cfg.Slot0.kD = 0.0;
     cfg.Slot0.kV = 0.12;
-    cfg.Slot0.kS = 0.25; // Static friction compensation
+    cfg.Slot0.kS = 0.25; // Original static friction
 
     // Motion Magic
     cfg.MotionMagic.MotionMagicCruiseVelocity = 80; // rps
-    cfg.MotionMagic.MotionMagicAcceleration = 160; // rps/s
+    cfg.MotionMagic.MotionMagicAcceleration = 100; // rps/s (Less aggressive than 160)
     cfg.MotionMagic.MotionMagicJerk = 1600; // rps/s^2
 
     // Hardware Limit Switches
@@ -84,8 +87,9 @@ public class Climber extends SubsystemBase {
   }
 
   public void moveTo(double position) {
-    // Clamp target to valid range
-    double target = Math.max(0, Math.min(position, Constants.climberMaxHeight));
+    // Clamp target to valid range with offset
+    double safeMax = Constants.climberMaxHeight - offset;
+    double target = Math.max(0, Math.min(position, safeMax));
 
     climberL.setControl(mmReq.withPosition(target));
     climberR.setControl(mmReq.withPosition(target));
