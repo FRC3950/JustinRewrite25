@@ -197,9 +197,9 @@ public class RobotContainer {
                 // indexer only to shoot
                 joystick.rightTrigger().whileTrue(intake.indexer());
                 // Command both Climber arms to go up
-                joystick.pov(0).whileTrue(climber.Up());
+                joystick.pov(0).whileTrue(climber.climbCommand(() -> Constants.climberSpeed));
                 // Command both Climber arms to go down
-                joystick.pov(180).whileTrue(climber.Down());
+                joystick.pov(180).whileTrue(climber.climbCommand(() -> -Constants.climberSpeed));
 
                 drivetrain.registerTelemetry(logger::telemeterize);
         }
