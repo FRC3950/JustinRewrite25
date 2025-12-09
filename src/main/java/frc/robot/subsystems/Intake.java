@@ -42,6 +42,10 @@ public class Intake extends SubsystemBase {
     indexer.set(0);
   }
 
+  public void runIndexerReverse() {
+    indexer.set(-Constants.indexerSpeed);
+  }
+
   public boolean hasNote() {
     return !indexer.getReverseLimit().getValue().equals(ReverseLimitValue.Open);
   }
@@ -67,6 +71,16 @@ public class Intake extends SubsystemBase {
         () -> {
         },
         () -> runIndexer(),
+        interrupted -> stopIntake(),
+        () -> !hasNote(),
+        this);
+  }
+
+  public Command indexerReverse() {
+    return new FunctionalCommand(
+        () -> {
+        },
+        () -> runIndexerReverse(),
         interrupted -> stopIntake(),
         () -> !hasNote(),
         this);

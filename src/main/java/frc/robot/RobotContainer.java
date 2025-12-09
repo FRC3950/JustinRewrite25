@@ -194,12 +194,21 @@ public class RobotContainer {
                 joystick.a().whileTrue(intake.intakeCommand());
                 // outake/reverse intake if note stuck
                 joystick.b().whileTrue(intake.reverseCommand());
-                // indexer only to shoot
-                joystick.rightTrigger().whileTrue(intake.indexer());
                 // Command both Climber arms to go up
                 joystick.pov(0).whileTrue(climber.climbCommand(() -> Constants.climberSpeed));
                 // Command both Climber arms to go down
                 joystick.pov(180).whileTrue(climber.climbCommand(() -> -Constants.climberSpeed));
+
+                // Amp Command
+                Command ampCommand = pivot.ampCommand();
+                joystick.x().whileTrue(ampCommand);
+
+                // Indexer control: Reverse if Amp command is running, otherwise normal
+                joystick.rightTrigger().whileTrue(
+                                Commands.either(
+                                                intake.indexerReverse(),
+                                                intake.indexer(),
+                                                ampCommand::isScheduled));
 
                 drivetrain.registerTelemetry(logger::telemeterize);
         }

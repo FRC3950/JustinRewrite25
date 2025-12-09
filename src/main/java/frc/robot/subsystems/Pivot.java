@@ -42,6 +42,10 @@ public class Pivot extends SubsystemBase {
     pivot.setControl(mm_request.withPosition(0).withFeedForward(getFeedForward()));
   }
 
+  public void pivotAmp() {
+    pivot.setControl(mm_request.withPosition(63).withFeedForward(getFeedForward()));
+  }
+
   public double angleToPos(double angle) {
     return angle / Constants.pivotOffsetAngleThingy;
   }
@@ -65,6 +69,10 @@ public class Pivot extends SubsystemBase {
 
   public Command stowDefault() {
     return Commands.run(this::stow, this);
+  }
+
+  public Command ampCommand() {
+    return Commands.run(this::pivotAmp, this);
   }
 
   public static TalonFX getMotor() {
