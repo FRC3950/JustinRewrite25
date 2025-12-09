@@ -31,11 +31,11 @@ public class Climber extends SubsystemBase {
     cfg.MotorOutput.withNeutralMode(NeutralModeValue.Coast);
 
     // Apply to Left (Inverted)
-    cfg.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
+    cfg.MotorOutput.withInverted(InvertedValue.CounterClockwise_Positive);
     climberL.getConfigurator().apply(cfg);
 
     // Apply to Right (Not Inverted)
-    cfg.MotorOutput.withInverted(InvertedValue.CounterClockwise_Positive);
+    cfg.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
     climberR.getConfigurator().apply(cfg);
   }
 
