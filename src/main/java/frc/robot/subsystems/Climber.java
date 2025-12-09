@@ -13,6 +13,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
+import com.ctre.phoenix6.signals.InvertedValue;
 
 public class Climber extends SubsystemBase {
 
@@ -28,7 +29,13 @@ public class Climber extends SubsystemBase {
     cfg.HardwareLimitSwitch.withReverseLimitType(ReverseLimitTypeValue.NormallyOpen);
     cfg.HardwareLimitSwitch.withReverseLimitEnable(true);
     cfg.MotorOutput.withNeutralMode(NeutralModeValue.Coast);
+
+    // Apply to Left (Inverted)
+    cfg.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
     climberL.getConfigurator().apply(cfg);
+
+    // Apply to Right (Not Inverted)
+    cfg.MotorOutput.withInverted(InvertedValue.CounterClockwise_Positive);
     climberR.getConfigurator().apply(cfg);
   }
 
@@ -41,19 +48,10 @@ public class Climber extends SubsystemBase {
 
   private double getTargetVoltage(DoubleSupplier yAxisPercentage, double motorPosition) {
     var percent = yAxisPercentage.getAsDouble();
-
     if (percent > 0.15) {
       return -yAxisPercentage.getAsDouble() * 6;
     } else if (percent < -0.15) {
       return yAxisPercentage.getAsDouble() * -8;
-    } 
-    if (climberL.getReverseLimit().getValue() == ReverseLimitValue.ClosedToGround) {
-      climberL.stopMotor();
-      return 0;
-    }
-    if (climberR.getReverseLimit().getValue() == ReverseLimitValue.ClosedToGround) {
-      climberR.stopMotor();
-      return 0;
     }
     return 0;
   }
@@ -61,9 +59,12 @@ public class Climber extends SubsystemBase {
   private void setMotorVoltage(DoubleSupplier yAxisPercentage) {
     climberL.getPosition().refresh();
     climberR.getPosition().refresh();
-
-    climberL.setVoltage(-getTargetVoltage(yAxisPercentage, Math.abs(climberL.getPosition().getValueAsDouble())));
-    climberR.setVoltage(-getTargetVoltage(yAxisPercentage, Math.abs(climberR.getPosition().getValueAsDouble())));
+    if (climberL.getReverseLimit().getValue() == ReverseLimitValue.Open) {
+      climberL.setVoltage(-getTargetVoltage(yAxisPercentage, Math.abs(climberL.getPosition().getValueAsDouble())));
+    }
+    if (climberR.getReverseLimit().getValue() == ReverseLimitValue.Open) {
+      climberR.setVoltage(-getTargetVoltage(yAxisPercentage, Math.abs(climberR.getPosition().getValueAsDouble())));
+    }
   }
 
 }
