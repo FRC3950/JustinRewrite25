@@ -9,7 +9,7 @@ public class Constants {
     public static double shooterSpeed = 70; // percent 0-100
     public static double intakeSpeed = -0.50; // duty cycle 0-1
     public static double indexerSpeed = 0.40; // duty cycle 0-1
-    public static double climberSpeed = 0.8; // duty cycle 0-1
+    public static double climberSpeed = 1; // duty cycle 0-1
     public final static double climberMaxHeight = 45; // rotations
     public final static double flipperAmpPos = 0; // rotations
     public final static double flipperStowPos = 0.65; // rotations

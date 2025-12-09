@@ -12,6 +12,7 @@ import java.util.function.DoubleSupplier;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
+import com.ctre.phoenix6.signals.ReverseLimitValue;
 
 public class Climber extends SubsystemBase {
 
@@ -41,12 +42,19 @@ public class Climber extends SubsystemBase {
   private double getTargetVoltage(DoubleSupplier yAxisPercentage, double motorPosition) {
     var percent = yAxisPercentage.getAsDouble();
 
-    if (motorPosition < 3.95 && percent > 0.15) {
+    if (percent > 0.15) {
       return -yAxisPercentage.getAsDouble() * 6;
     } else if (percent < -0.15) {
       return yAxisPercentage.getAsDouble() * -8;
+    } 
+    if (climberL.getReverseLimit().getValue() == ReverseLimitValue.ClosedToGround) {
+      climberL.stopMotor();
+      return 0;
     }
-
+    if (climberR.getReverseLimit().getValue() == ReverseLimitValue.ClosedToGround) {
+      climberR.stopMotor();
+      return 0;
+    }
     return 0;
   }
 
