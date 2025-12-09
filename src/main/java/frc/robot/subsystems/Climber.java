@@ -2,7 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+
 import frc.robot.Constants;
 
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -40,10 +40,58 @@ public class Climber extends SubsystemBase {
   }
 
   public Command climbCommand(DoubleSupplier yAxisPercentage) {
-    return Commands.runEnd(
-        () -> setMotorVoltage(yAxisPercentage),
-        () -> setMotorVoltage(() -> 0.0),
-        this);
+    Command cmd = new Command() {
+      private boolean stopLeft = false;
+      private boolean stopRight = false;
+
+      @Override
+      public void initialize() {
+        stopLeft = false;
+        stopRight = false;
+      }
+
+      @Override
+      public void execute() {
+        climberL.getPosition().refresh();
+        climberR.getPosition().refresh();
+        climberL.getReverseLimit().refresh();
+        climberR.getReverseLimit().refresh();
+
+        // Check limits and latch stop state if hit
+        if (climberL.getReverseLimit().getValue() == ReverseLimitValue.ClosedToGround) {
+          stopLeft = true;
+        }
+        if (climberR.getReverseLimit().getValue() == ReverseLimitValue.ClosedToGround) {
+          stopRight = true;
+        }
+
+        // Calculate target voltages (negative for down, positive for up)
+        double targetVoltsL = -getTargetVoltage(yAxisPercentage, Math.abs(climberL.getPosition().getValueAsDouble()));
+        double targetVoltsR = -getTargetVoltage(yAxisPercentage, Math.abs(climberR.getPosition().getValueAsDouble()));
+
+        // Apply voltages with latching logic
+        // If latched (limit hit) AND trying to go DOWN (negative voltage), force 0
+        if (stopLeft && targetVoltsL < 0) {
+          climberL.setVoltage(0);
+        } else {
+          climberL.setVoltage(targetVoltsL);
+        }
+
+        if (stopRight && targetVoltsR < 0) {
+          climberR.setVoltage(0);
+        } else {
+          climberR.setVoltage(targetVoltsR);
+        }
+      }
+
+      @Override
+      public void end(boolean interrupted) {
+        climberL.setVoltage(0);
+        climberR.setVoltage(0);
+      }
+    };
+    cmd.addRequirements(this);
+    return cmd;
   }
 
   private double getTargetVoltage(DoubleSupplier yAxisPercentage, double motorPosition) {
@@ -54,17 +102,6 @@ public class Climber extends SubsystemBase {
       return yAxisPercentage.getAsDouble() * -8;
     }
     return 0;
-  }
-
-  private void setMotorVoltage(DoubleSupplier yAxisPercentage) {
-    climberL.getPosition().refresh();
-    climberR.getPosition().refresh();
-    if (climberL.getReverseLimit().getValue() == ReverseLimitValue.Open) {
-      climberL.setVoltage(-getTargetVoltage(yAxisPercentage, Math.abs(climberL.getPosition().getValueAsDouble())));
-    }
-    if (climberR.getReverseLimit().getValue() == ReverseLimitValue.Open) {
-      climberR.setVoltage(-getTargetVoltage(yAxisPercentage, Math.abs(climberR.getPosition().getValueAsDouble())));
-    }
   }
 
 }
