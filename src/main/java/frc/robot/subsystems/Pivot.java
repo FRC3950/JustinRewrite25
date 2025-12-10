@@ -71,9 +71,6 @@ public class Pivot extends SubsystemBase {
     return Commands.run(this::stow, this);
   }
 
-  public Command ampCommand() {
-    return Commands.run(this::pivotAmp, this);
-  }
 
   public static TalonFX getMotor() {
     return pivot;

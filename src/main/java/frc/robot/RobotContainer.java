@@ -28,6 +28,7 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Pivot;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Flipper;
+import frc.robot.commands.AmpCommand;
 
 public class RobotContainer {
         // MaxSpeed removed, using Constants.drivetrainMaxSpeed
@@ -176,6 +177,7 @@ public class RobotContainer {
                 // Idle while the robot is disabled. This ensures the configured
                 // neutral mode is applied to the drive motors while disabled.
                 final var idle = new SwerveRequest.Idle();
+                AmpCommand ampCommand = new AmpCommand(flipper, pivot);
                 RobotModeTriggers.disabled().whileTrue(
                                 drivetrain.applyRequest(() -> idle).ignoringDisable(true));
 
@@ -200,15 +202,14 @@ public class RobotContainer {
                 joystick.pov(180).whileTrue(climber.climbCommand(() -> -Constants.climberSpeed));
 
                 // Amp Command
-                
-                joystick.x().whileTrue(pivot.ampCommand());
+                joystick.x().whileTrue(ampCommand);
 
                 // Indexer control: Reverse if Amp command is running, otherwise normal
                 joystick.rightTrigger().whileTrue(
                                 Commands.either(
                                                 intake.indexerReverse(),
                                                 intake.indexer(),
-                                                pivot.ampCommand()::isScheduled));
+                                                ampCommand::isScheduled));
 
                 drivetrain.registerTelemetry(logger::telemeterize);
         }

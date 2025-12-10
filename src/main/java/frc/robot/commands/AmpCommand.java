@@ -13,10 +13,12 @@ import frc.robot.subsystems.Pivot;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AmpCommand extends Command {
   private final Intake intake = new Intake();
-  private final Flipper flipper = new Flipper();
-  private final Pivot pivot = new Pivot();
-  public AmpCommand() {
+  private final Flipper flipper;
+  private final Pivot pivot;
+  public AmpCommand(Flipper flipper, Pivot pivot) {
     addRequirements(flipper, pivot);
+    this.flipper = flipper;
+    this.pivot = pivot;
   }
 
   // Called when the command is initially scheduled.
