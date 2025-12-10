@@ -15,6 +15,7 @@ public class AmpCommand extends Command {
   private final Intake intake = new Intake();
   private final Flipper flipper;
   private final Pivot pivot;
+
   public AmpCommand(Flipper flipper, Pivot pivot) {
     addRequirements(flipper, pivot);
     this.flipper = flipper;
@@ -23,13 +24,14 @@ public class AmpCommand extends Command {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     pivot.pivotAmp();
-    if (pivot.getPosition() >= (Constants.pivotAmpPos-10)) {
+    if (pivot.getPosition() >= (Constants.pivotAmpPos - 10)) {
       flipper.goToAmp();
     }
   }
@@ -43,6 +45,6 @@ public class AmpCommand extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return !intake.hasNote();
+    return false;
   }
 }
