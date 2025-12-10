@@ -43,7 +43,7 @@ public class Pivot extends SubsystemBase {
   }
 
   public void pivotAmp() {
-    pivot.setControl(mm_request.withPosition(63).withFeedForward(getFeedForward()));
+    pivot.setControl(mm_request.withPosition(Constants.pivotAmpPos).withFeedForward(getFeedForward()));
   }
 
   public double angleToPos(double angle) {
@@ -58,6 +58,10 @@ public class Pivot extends SubsystemBase {
     return () -> pivot.getReverseLimit().getValue().equals(ReverseLimitValue.ClosedToGround);
   }
 
+  public double getPosition() {
+    return pivot.getPosition().getValue().in(Rotations);
+  }
+
   public static Command zeroEncoder() {
     return new InstantCommand(
         () -> pivot.setPosition(0));
@@ -70,7 +74,6 @@ public class Pivot extends SubsystemBase {
   public Command stowDefault() {
     return Commands.run(this::stow, this);
   }
-
 
   public static TalonFX getMotor() {
     return pivot;

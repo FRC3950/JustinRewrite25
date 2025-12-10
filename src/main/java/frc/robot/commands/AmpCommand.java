@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Flipper;
 import frc.robot.subsystems.Pivot;
-
+import frc.robot.Constants;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AmpCommand extends Command {
@@ -29,7 +29,9 @@ public class AmpCommand extends Command {
   @Override
   public void execute() {
     pivot.pivotAmp();
-    flipper.goToAmp();
+    if (pivot.getPosition() >= (Constants.pivotAmpPos-10)) {
+      flipper.goToAmp();
+    }
   }
 
   // Called once the command ends or is interrupted.

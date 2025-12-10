@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.units.measure.Angle;
+
 /** Add your docs here. */
 public class Constants {
     public static double shooterSpeed = 70; // percent 0-100
@@ -30,4 +32,5 @@ public class Constants {
     public static final double driveSpeedIndoor = 4.3;
     public static final double driveSpeedOutdoor = 3.5;
     public static final double driveSpeedKid = 1.5;
+    public static final double pivotAmpPos = 63;
 }
