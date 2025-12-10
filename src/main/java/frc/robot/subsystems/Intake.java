@@ -65,22 +65,16 @@ public class Intake extends SubsystemBase {
     return Commands.startEnd(this::reverse, this::stopIntake, this);
   }
 
+  public Command reverseIndexerCommand() {
+    return Commands.startEnd(this::runIndexerReverse, this::stopIntake, this);
+  }
+
   // Command instantly finishes if there isn't a note, as intended :)
   public Command indexer() {
     return new FunctionalCommand(
         () -> {
         },
         () -> runIndexer(),
-        interrupted -> stopIntake(),
-        () -> !hasNote(),
-        this);
-  }
-
-  public Command indexerReverse() {
-    return new FunctionalCommand(
-        () -> {
-        },
-        () -> runIndexerReverse(),
         interrupted -> stopIntake(),
         () -> !hasNote(),
         this);

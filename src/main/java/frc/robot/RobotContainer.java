@@ -207,7 +207,7 @@ public class RobotContainer {
                 // Indexer control: Reverse if Amp command is running, otherwise normal
                 joystick.rightTrigger().whileTrue(
                                 Commands.either(
-                                                intake.indexerReverse(),
+                                                intake.reverseIndexerCommand(),
                                                 intake.indexer(),
                                                 ampCommand::isScheduled));
 
