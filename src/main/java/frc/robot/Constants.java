@@ -8,18 +8,19 @@ package frc.robot;
 public class Constants {
     public static double shooterSpeed = 70; // percent 0-100
     public static double intakeSpeed = -0.50; // duty cycle 0-1
-    public static double indexerSpeed = 0.65; // duty cycle 0-1
+    public static double indexerSpeed = 0.3; // duty cycle 0-1
+    public static double indexerSpeedAct = 0.65; // duty cycle 0-1
     public static double climberSpeed = 1; // duty cycle 0-1
     public final static double climberMaxHeight = 45; // rotations
     public final static double flipperAmpPos = -1.2; // rotations
     public final static double flipperStowPos = 0.65; // rotations
     public static double pivotShootAngle = 45; // 0-160ish
-    public static double pivotStowPosition = -1.5; // position
+    public static double pivotStowPosition = -2; // position
     public static double pivotOffsetAngleThingy = 2.2949635; // calibration offset
     public static double drivetrainMaxSpeed = 4.49; // Meters per second
     public static double pivotAmpPos = 63; // position
-    public static double pivotStowDescentVolts = -3.0;
-    public static double pivotStowHoldVolts = -1.0;
+    public static double pivotStowDescentVolts = -6.0;
+    public static double pivotStowHoldVolts = -0.25;
     // Presets
     public static final double shooterSpeedHigh = 90;
     public static final double shooterSpeedMedium = 65;

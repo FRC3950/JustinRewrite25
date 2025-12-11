@@ -73,7 +73,7 @@ public class Pivot extends SubsystemBase {
   }
 
   public Command stowDefault() {
-    return Commands.run(() -> pivot.setControl(new VoltageOut(Constants.pivotStowDescentVolts)), this)
+    return Commands.run(() -> pivot.setControl(pos.withPosition(Constants.pivotStowPosition).withFeedForward(getFeedForward())), this)
         .until(pivotZero())
         .andThen(Commands.run(() -> pivot.setControl(new VoltageOut(Constants.pivotStowHoldVolts)), this));
   }

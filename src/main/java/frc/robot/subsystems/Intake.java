@@ -34,7 +34,7 @@ public class Intake extends SubsystemBase {
   }
 
   public void runIndexer() {
-    indexer.set(Constants.indexerSpeed);
+    indexer.set(Constants.indexerSpeedAct);
   }
 
   public void stopIntake() {
@@ -43,7 +43,7 @@ public class Intake extends SubsystemBase {
   }
 
   public void runIndexerReverse() {
-    indexer.set(-Constants.indexerSpeed);
+    indexer.set(-Constants.indexerSpeedAct);
   }
 
   public boolean hasNote() {
