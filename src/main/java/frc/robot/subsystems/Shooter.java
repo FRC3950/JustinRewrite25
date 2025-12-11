@@ -18,7 +18,6 @@ public class Shooter extends SubsystemBase {
   /** Creates a new ShooterShoot. */
   private final TalonFX inner = new TalonFX(13, "CANivore");
   private final TalonFX outer = new TalonFX(17, "CANivore");
-  private final VelocityVoltage vv = new VelocityVoltage(0).withSlot(0);
 
   private static final double kP = 0.2;
   private static final double kI = 0.0;

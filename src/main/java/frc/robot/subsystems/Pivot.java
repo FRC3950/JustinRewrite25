@@ -13,6 +13,7 @@ import java.util.function.BooleanSupplier;
 
 import com.ctre.phoenix6.controls.DynamicMotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
 
@@ -72,7 +73,9 @@ public class Pivot extends SubsystemBase {
   }
 
   public Command stowDefault() {
-    return Commands.run(this::stow, this);
+    return Commands.run(() -> pivot.setControl(new VoltageOut(Constants.pivotStowDescentVolts)), this)
+        .until(pivotZero())
+        .andThen(Commands.run(() -> pivot.setControl(new VoltageOut(Constants.pivotStowHoldVolts)), this));
   }
 
   public static TalonFX getMotor() {

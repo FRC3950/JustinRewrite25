@@ -4,13 +4,11 @@
 
 package frc.robot;
 
-import edu.wpi.first.units.measure.Angle;
-
 /** Add your docs here. */
 public class Constants {
     public static double shooterSpeed = 70; // percent 0-100
     public static double intakeSpeed = -0.50; // duty cycle 0-1
-    public static double indexerSpeed = 0.40; // duty cycle 0-1
+    public static double indexerSpeed = 0.65; // duty cycle 0-1
     public static double climberSpeed = 1; // duty cycle 0-1
     public final static double climberMaxHeight = 45; // rotations
     public final static double flipperAmpPos = -1.2; // rotations
@@ -19,7 +17,9 @@ public class Constants {
     public static double pivotStowPosition = -1.5; // position
     public static double pivotOffsetAngleThingy = 2.2949635; // calibration offset
     public static double drivetrainMaxSpeed = 4.49; // Meters per second
-
+    public static double pivotAmpPos = 63; // position
+    public static double pivotStowDescentVolts = -3.0;
+    public static double pivotStowHoldVolts = -1.0;
     // Presets
     public static final double shooterSpeedHigh = 90;
     public static final double shooterSpeedMedium = 65;
@@ -32,5 +32,4 @@ public class Constants {
     public static final double driveSpeedIndoor = 4.3;
     public static final double driveSpeedOutdoor = 3.5;
     public static final double driveSpeedKid = 1.5;
-    public static final double pivotAmpPos = 63;
 }
