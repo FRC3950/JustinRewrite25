@@ -19,8 +19,10 @@ public class DriveToNote {
         return Commands.defer(() -> {
             Pose2d targetPose = vision.getTargetPose(drivetrain.getState().Pose);
             if (targetPose == null) {
+                System.out.println("DriveToNote: No target found!");
                 return Commands.none();
             }
+            System.out.println("DriveToNote: Target found at " + targetPose);
 
             // Create a path to the target pose
             // We want to stop slightly before the note to intake it? Or drive through it?

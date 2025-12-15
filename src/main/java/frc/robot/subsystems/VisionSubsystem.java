@@ -63,4 +63,11 @@ public class VisionSubsystem extends SubsystemBase {
 
         return new Pose2d(targetTranslation, new Rotation2d()); // Orientation of note doesn't matter
     }
+
+    @Override
+    public void periodic() {
+        edu.wpi.first.wpilibj.smartdashboard.SmartDashboard.putBoolean("Vision/HasTarget", hasTarget());
+        edu.wpi.first.wpilibj.smartdashboard.SmartDashboard.putNumber("Vision/Tx", getTargetTx());
+        edu.wpi.first.wpilibj.smartdashboard.SmartDashboard.putNumber("Vision/Ty", getTargetTy());
+    }
 }
