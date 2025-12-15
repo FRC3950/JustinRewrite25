@@ -3,6 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
+import edu.wpi.first.math.util.Units;
+
 
 /** Add your docs here. */
 public class Constants {
@@ -33,4 +35,10 @@ public class Constants {
     public static final double driveSpeedIndoor = 4.3;
     public static final double driveSpeedOutdoor = 3.5;
     public static final double driveSpeedKid = 1.5;
+
+    // Vision Constants
+    public static final String limelightName = "limelight-notes";
+    public static final double limelightMountHeight = Units.inchesToMeters(26.5); // Meters
+    public static final double limelightMountAngle = 80.0; // Degrees
+    public static final double noteTargetHeight = 0.0; // Meters (on the floor)
 }

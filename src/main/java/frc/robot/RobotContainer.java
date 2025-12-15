@@ -29,6 +29,8 @@ import frc.robot.subsystems.Pivot;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Flipper;
 import frc.robot.commands.AmpCommand;
+import frc.robot.commands.DriveToNote;
+import frc.robot.subsystems.VisionSubsystem;
 
 public class RobotContainer {
         // MaxSpeed removed, using Constants.drivetrainMaxSpeed
@@ -148,6 +150,8 @@ public class RobotContainer {
                 // Schedule startup music
         }
 
+        public final VisionSubsystem vision = new VisionSubsystem();
+
         private void configureBindings() {
                 // Note that X is defined as forward according to WPILib convention,
                 // and Y is defined as to the left according to WPILib convention.
@@ -210,6 +214,9 @@ public class RobotContainer {
                                                 intake.reverseIndexerCommand(),
                                                 intake.indexer(),
                                                 ampCommand::isScheduled));
+
+                // Drive to Note
+                joystick.leftTrigger().whileTrue(DriveToNote.create(drivetrain, vision));
 
                 drivetrain.registerTelemetry(logger::telemeterize);
         }
