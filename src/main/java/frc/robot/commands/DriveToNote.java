@@ -36,7 +36,8 @@ public class DriveToNote {
                     targetPose,
                     constraints,
                     0.0 // Goal end velocity
-            );
+            ).andThen(Commands.runOnce(() -> System.out.println("DriveToNote: Path finished")))
+                    .beforeStarting(Commands.runOnce(() -> System.out.println("DriveToNote: Path starting")));
         }, Set.of(drivetrain));
     }
 }
