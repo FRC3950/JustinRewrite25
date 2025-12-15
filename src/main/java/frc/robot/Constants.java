@@ -40,5 +40,5 @@ public class Constants {
     public static final String limelightName = "limelight-notes";
     public static final double limelightMountHeight = Units.inchesToMeters(26.5); // Meters
     public static final double limelightMountAngle = 80.0; // Degrees
-    public static final double noteTargetHeight = 0.0; // Meters (on the floor)
+    public static final double noteTargetHeight = Units.inchesToMeters(2); // Meters (on the floor)
 }
