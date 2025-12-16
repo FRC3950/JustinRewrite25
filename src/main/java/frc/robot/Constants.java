@@ -3,8 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
-import edu.wpi.first.math.util.Units;
 
+import edu.wpi.first.math.util.Units;
 
 /** Add your docs here. */
 public class Constants {
@@ -41,4 +41,14 @@ public class Constants {
     public static final double limelightMountHeight = Units.inchesToMeters(26.5); // Meters
     public static final double limelightMountAngle = 80.0; // Degrees
     public static final double noteTargetHeight = Units.inchesToMeters(2); // Meters (on the floor)
+
+    // DriveToNote PID Constants
+    public static final double driveKP = 2.0;
+    public static final double driveKI = 0.0;
+    public static final double driveKD = 0.0;
+    public static final double turnKP = 2.0;
+    public static final double turnKI = 0.0;
+    public static final double turnKD = 0.0;
+    public static final double driveTolerance = 0.1; // Meters
+    public static final double turnTolerance = Units.degreesToRadians(3); // Radians
 }

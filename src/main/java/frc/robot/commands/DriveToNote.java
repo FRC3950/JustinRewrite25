@@ -1,75 +1,80 @@
 package frc.robot.commands;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.PathConstraints;
+import com.ctre.phoenix6.swerve.SwerveRequest;
 
-import java.util.Set;
-
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Constants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.VisionSubsystem;
 
 public class DriveToNote extends Command {
     private final CommandSwerveDrivetrain drivetrain;
     private final VisionSubsystem vision;
-    private Command pathCommand;
+
+    private final PIDController xController = new PIDController(Constants.driveKP, Constants.driveKI,
+            Constants.driveKD);
+    private final PIDController yController = new PIDController(Constants.driveKP, Constants.driveKI,
+            Constants.driveKD);
+    private final PIDController thetaController = new PIDController(Constants.turnKP, Constants.turnKI,
+            Constants.turnKD);
+
+    private Pose2d targetPose;
 
     public DriveToNote(CommandSwerveDrivetrain drivetrain, VisionSubsystem vision) {
         this.drivetrain = drivetrain;
         this.vision = vision;
         addRequirements(drivetrain);
+
+        thetaController.enableContinuousInput(-Math.PI, Math.PI);
+        xController.setTolerance(Constants.driveTolerance);
+        yController.setTolerance(Constants.driveTolerance);
+        thetaController.setTolerance(Constants.turnTolerance);
     }
 
     @Override
     public void initialize() {
-        Pose2d targetPose = vision.getTargetPose(drivetrain.getState().Pose);
+        targetPose = vision.getTargetPose(drivetrain.getState().Pose);
         if (targetPose == null) {
             System.out.println("DriveToNote: No target found!");
-            pathCommand = null;
             return;
         }
         System.out.println("DriveToNote: Target found at " + targetPose);
 
-        PathConstraints constraints = new PathConstraints(
-                2.0, 3.0,
-                Units.degreesToRadians(360), Units.degreesToRadians(540));
-
-        pathCommand = AutoBuilder.pathfindToPose(
-                targetPose,
-                constraints,
-                0.0 // Goal end velocity
-        );
-        pathCommand.initialize();
+        xController.reset();
+        yController.reset();
+        thetaController.reset();
     }
 
     @Override
     public void execute() {
-        if (pathCommand != null) {
-            pathCommand.execute();
-            if (pathCommand.isFinished()) {
-                System.out.println("DriveToNote: PathCommand finished in execute");
-            }
-        }
+        if (targetPose == null)
+            return;
+
+        Pose2d currentPose = drivetrain.getState().Pose;
+
+        double xSpeed = xController.calculate(currentPose.getX(), targetPose.getX());
+        double ySpeed = yController.calculate(currentPose.getY(), targetPose.getY());
+        double thetaSpeed = thetaController.calculate(currentPose.getRotation().getRadians(),
+                targetPose.getRotation().getRadians());
+
+        // Transform field-relative speeds to robot-relative
+        ChassisSpeeds fieldSpeeds = new ChassisSpeeds(xSpeed, ySpeed, thetaSpeed);
+        ChassisSpeeds robotSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(fieldSpeeds, currentPose.getRotation());
+
+        drivetrain.setControl(new SwerveRequest.ApplyRobotSpeeds().withSpeeds(robotSpeeds));
     }
 
     @Override
     public void end(boolean interrupted) {
-        System.out.println("DriveToNote: Ending. Interrupted=" + interrupted);
-        if (pathCommand != null) {
-            pathCommand.end(interrupted);
-        }
+        drivetrain.setControl(new SwerveRequest.Idle());
     }
 
     @Override
     public boolean isFinished() {
-        boolean finished = pathCommand == null || pathCommand.isFinished();
-        if (finished) {
-            // System.out.println("DriveToNote: isFinished=true");
-        }
-        return finished;
+        return targetPose != null && xController.atSetpoint() && yController.atSetpoint()
+                && thetaController.atSetpoint();
     }
 }
