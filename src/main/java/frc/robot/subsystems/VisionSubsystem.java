@@ -61,7 +61,11 @@ public class VisionSubsystem extends SubsystemBase {
         Translation2d targetTranslation = robotTranslation.plus(new Translation2d(distanceFromLimelightToGoalMeters,
                 robotHeading.minus(Rotation2d.fromDegrees(targetOffsetAngle_Horizontal))));
 
-        return new Pose2d(targetTranslation, new Rotation2d()); // Orientation of note doesn't matter
+        Pose2d targetPose = new Pose2d(targetTranslation, new Rotation2d());
+
+        System.out.println("Vision: Distance=" + distanceFromLimelightToGoalMeters + "m, Pose=" + targetPose);
+
+        return targetPose;
     }
 
 }

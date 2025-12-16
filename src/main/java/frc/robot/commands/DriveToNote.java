@@ -50,11 +50,15 @@ public class DriveToNote extends Command {
     public void execute() {
         if (pathCommand != null) {
             pathCommand.execute();
+            if (pathCommand.isFinished()) {
+                System.out.println("DriveToNote: PathCommand finished in execute");
+            }
         }
     }
 
     @Override
     public void end(boolean interrupted) {
+        System.out.println("DriveToNote: Ending. Interrupted=" + interrupted);
         if (pathCommand != null) {
             pathCommand.end(interrupted);
         }
@@ -62,6 +66,10 @@ public class DriveToNote extends Command {
 
     @Override
     public boolean isFinished() {
-        return pathCommand == null || pathCommand.isFinished();
+        boolean finished = pathCommand == null || pathCommand.isFinished();
+        if (finished) {
+            // System.out.println("DriveToNote: isFinished=true");
+        }
+        return finished;
     }
 }
