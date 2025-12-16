@@ -34,6 +34,9 @@ public class DriveToNote extends Command {
         thetaController.setTolerance(Constants.turnTolerance);
     }
 
+    private final edu.wpi.first.wpilibj.Timer timer = new edu.wpi.first.wpilibj.Timer();
+    private static final double TIMEOUT = 3.0; // Seconds
+
     @Override
     public void initialize() {
         targetPose = vision.getTargetPose(drivetrain.getState().Pose);
@@ -46,6 +49,7 @@ public class DriveToNote extends Command {
         xController.reset();
         yController.reset();
         thetaController.reset();
+        timer.restart();
     }
 
     @Override
@@ -70,11 +74,16 @@ public class DriveToNote extends Command {
     @Override
     public void end(boolean interrupted) {
         drivetrain.setControl(new SwerveRequest.Idle());
+        System.out.println("DriveToNote: Ended. Interrupted=" + interrupted);
     }
 
     @Override
     public boolean isFinished() {
         if (targetPose == null) {
+            return true;
+        }
+        if (timer.hasElapsed(TIMEOUT)) {
+            System.out.println("DriveToNote: Timed out!");
             return true;
         }
         boolean atSetpoint = xController.atSetpoint() && yController.atSetpoint() && thetaController.atSetpoint();

@@ -39,8 +39,12 @@ public class VisionSubsystem extends SubsystemBase {
         double targetOffsetAngle_Horizontal = getTargetTx();
 
         // Calculate distance
-        double angleToGoalRadians = Math.toRadians(Constants.limelightMountAngle + targetOffsetAngle_Vertical);
-        double distanceFromLimelightToGoalMeters = (Constants.noteTargetHeight - Constants.limelightMountHeight)
+        // Assuming limelightMountAngle is degrees down from horizontal
+        double angleToGoalDegrees = Constants.limelightMountAngle + targetOffsetAngle_Vertical;
+        double angleToGoalRadians = Math.toRadians(angleToGoalDegrees);
+
+        // d = (h_cam - h_target) / tan(angle)
+        double distanceFromLimelightToGoalMeters = (Constants.limelightMountHeight - Constants.noteTargetHeight)
                 / Math.tan(angleToGoalRadians);
 
         // Calculate field-relative position
@@ -63,7 +67,8 @@ public class VisionSubsystem extends SubsystemBase {
 
         Pose2d targetPose = new Pose2d(targetTranslation, new Rotation2d());
 
-        System.out.println("Vision: Distance=" + distanceFromLimelightToGoalMeters + "m, Pose=" + targetPose);
+        System.out.println("Vision: Dist=" + distanceFromLimelightToGoalMeters + "m, Angle=" + angleToGoalDegrees
+                + ", Pose=" + targetPose);
 
         return targetPose;
     }
