@@ -49,6 +49,6 @@ public class Constants {
     public static final double turnKP = 2.0;
     public static final double turnKI = 0.0;
     public static final double turnKD = 0.0;
-    public static final double driveTolerance = 0.1; // Meters
+    public static final double driveTolerance = 0.05; // Meters
     public static final double turnTolerance = Units.degreesToRadians(3); // Radians
 }

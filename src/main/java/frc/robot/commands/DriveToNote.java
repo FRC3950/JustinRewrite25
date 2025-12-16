@@ -74,7 +74,13 @@ public class DriveToNote extends Command {
 
     @Override
     public boolean isFinished() {
-        return targetPose != null && xController.atSetpoint() && yController.atSetpoint()
-                && thetaController.atSetpoint();
+        if (targetPose == null) {
+            return true;
+        }
+        boolean atSetpoint = xController.atSetpoint() && yController.atSetpoint() && thetaController.atSetpoint();
+        if (atSetpoint) {
+            System.out.println("DriveToNote: Finished at setpoint.");
+        }
+        return atSetpoint;
     }
 }
