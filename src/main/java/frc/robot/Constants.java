@@ -41,6 +41,7 @@ public class Constants {
     public static final double limelightMountHeight = Units.inchesToMeters(26.5); // Meters
     public static final double limelightMountAngle = 80.0; // Degrees
     public static final double noteTargetHeight = Units.inchesToMeters(2); // Meters (on the floor)
+    public static final double visionDistanceOffset = 0.5; // Meters to add to calculated distance
 
     // DriveToNote PID Constants
     public static final double driveKP = 2.0;

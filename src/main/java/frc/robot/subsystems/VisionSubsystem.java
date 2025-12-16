@@ -43,9 +43,12 @@ public class VisionSubsystem extends SubsystemBase {
         double angleToGoalDegrees = Constants.limelightMountAngle + targetOffsetAngle_Vertical;
         double angleToGoalRadians = Math.toRadians(angleToGoalDegrees);
 
-        // d = (h_cam - h_target) / tan(angle)
-        double distanceFromLimelightToGoalMeters = (Constants.limelightMountHeight - Constants.noteTargetHeight)
+        // d = (h_target - h_cam) / tan(angle)
+        double distanceFromLimelightToGoalMeters = (Constants.noteTargetHeight - Constants.limelightMountHeight)
                 / Math.tan(angleToGoalRadians);
+
+        // Add offset
+        distanceFromLimelightToGoalMeters += Constants.visionDistanceOffset;
 
         // Calculate field-relative position
         Rotation2d robotHeading = robotPose.getRotation();
