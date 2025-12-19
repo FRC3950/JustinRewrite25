@@ -16,9 +16,12 @@ public class DriveToNote extends Command {
     private final CommandSwerveDrivetrain drivetrain;
     private final VisionSubsystem vision;
 
-    private final PIDController xController = new PIDController(Constants.driveKP, Constants.driveKI, Constants.driveKD);
-    private final PIDController yController = new PIDController(Constants.driveKP, Constants.driveKI, Constants.driveKD);
-    private final PIDController thetaController = new PIDController(Constants.turnKP, Constants.turnKI, Constants.turnKD);
+    private final PIDController xController = new PIDController(Constants.driveKP, Constants.driveKI,
+            Constants.driveKD);
+    private final PIDController yController = new PIDController(Constants.driveKP, Constants.driveKI,
+            Constants.driveKD);
+    private final PIDController thetaController = new PIDController(Constants.turnKP, Constants.turnKI,
+            Constants.turnKD);
 
     private Translation2d lockedTargetLocation = null;
     private Rotation2d lockedTargetRotation = null;
@@ -38,7 +41,7 @@ public class DriveToNote extends Command {
     public void initialize() {
         timer.restart();
         Pose2d currentPose = drivetrain.getState().Pose;
-        
+
         // CAPTURE ONCE
         lockedTargetLocation = vision.getNoteFieldPosition(currentPose);
 
@@ -46,11 +49,10 @@ public class DriveToNote extends Command {
             // Calculate the angle from Note TO Robot (Backing in)
             // Note -> Robot vector is the opposite of Robot -> Note
             Translation2d robotToNote = lockedTargetLocation.minus(currentPose.getTranslation());
-            
-            // We want the back of the robot to face the note.
-            // If the note is at 0 degrees, the robot should face 180.
-            lockedTargetRotation = robotToNote.getAngle().plus(Rotation2d.fromDegrees(180));
-            
+
+            // We want the front of the robot to face the note.
+            lockedTargetRotation = robotToNote.getAngle();
+
             System.out.println("DriveToNote: Locked Target at " + lockedTargetLocation);
         }
 
@@ -72,28 +74,24 @@ public class DriveToNote extends Command {
         // Drive to the static Field-Relative position
         double xSpeed = xController.calculate(currentPose.getX(), lockedTargetLocation.getX());
         double ySpeed = yController.calculate(currentPose.getY(), lockedTargetLocation.getY());
-        
+
         // Turn to the static Field-Relative rotation
         double thetaSpeed = thetaController.calculate(
-            currentPose.getRotation().getRadians(), 
-            lockedTargetRotation.getRadians()
-        );
+                currentPose.getRotation().getRadians(),
+                lockedTargetRotation.getRadians());
 
-        // Convert Field-Relative speeds to Robot-Relative for the Swerve Request
+        // Use Field-Relative speeds directly
         ChassisSpeeds fieldSpeeds = new ChassisSpeeds(xSpeed, ySpeed, thetaSpeed);
-        
-        // SwerveRequest.ApplyRobotSpeeds expects speeds relative to the robot's front
-        ChassisSpeeds robotSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(fieldSpeeds, currentPose.getRotation());
 
-        drivetrain.setControl(new SwerveRequest.ApplyRobotSpeeds().withSpeeds(robotSpeeds));
+        drivetrain.setControl(new SwerveRequest.ApplyFieldSpeeds().withSpeeds(fieldSpeeds));
     }
 
     @Override
     public boolean isFinished() {
         // Stop if we never saw a note, if we timed out, or if we are at the spot
-        return lockedTargetLocation == null || 
-               timer.hasElapsed(TIMEOUT) || 
-               (xController.atSetpoint() && yController.atSetpoint() && thetaController.atSetpoint());
+        return lockedTargetLocation == null ||
+                timer.hasElapsed(TIMEOUT) ||
+                (xController.atSetpoint() && yController.atSetpoint() && thetaController.atSetpoint());
     }
 
     @Override
