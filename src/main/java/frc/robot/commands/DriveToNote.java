@@ -50,8 +50,9 @@ public class DriveToNote extends Command {
             // Note -> Robot vector is the opposite of Robot -> Note
             Translation2d robotToNote = lockedTargetLocation.minus(currentPose.getTranslation());
 
-            // We want the front of the robot to face the note.
-            lockedTargetRotation = robotToNote.getAngle();
+            // We want the back of the robot to face the note.
+            // If the note is at 0 degrees, the robot should face 180.
+            lockedTargetRotation = robotToNote.getAngle().plus(Rotation2d.fromDegrees(180));
 
             System.out.println("DriveToNote: Locked Target at " + lockedTargetLocation);
         }
