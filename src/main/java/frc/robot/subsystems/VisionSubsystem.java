@@ -9,65 +9,49 @@ import frc.robot.LimelightHelpers;
 
 public class VisionSubsystem extends SubsystemBase {
 
-    public VisionSubsystem() {
-    }
+    public VisionSubsystem() {}
 
     public boolean hasTarget() {
         return LimelightHelpers.getTV(Constants.limelightName);
     }
 
-    public double getTargetTx() {
-        return LimelightHelpers.getTX(Constants.limelightName);
-    }
-
-    public double getTargetTy() {
-        return LimelightHelpers.getTY(Constants.limelightName);
-    }
-
     /**
-     * Calculates the field-relative pose of the detected note.
-     * 
-     * @param robotPose The current pose of the robot.
-     * @return The Pose2d of the note, or null if no target is found.
+     * Calculates the Field-Relative center point of the Note.
+     * @param robotPose The current pose of the robot from Odometry.
+     * @return Translation2d location of the note, or null if no target.
      */
-    public Pose2d getTargetPose(Pose2d robotPose) {
+    public Translation2d getNoteFieldPosition(Pose2d robotPose) {
         if (!hasTarget()) {
             return null;
         }
 
-        double targetOffsetAngle_Vertical = getTargetTy();
-        double targetOffsetAngle_Horizontal = getTargetTx();
+        double ty = LimelightHelpers.getTY(Constants.limelightName);
+        double tx = LimelightHelpers.getTX(Constants.limelightName);
 
-        // 3. Calculate Forward Distance (X)
-        // Formula: d = (h_target - h_camera) / tan(mount_angle + ty)
+        // --- 1. Distance Calculation (Forward/X) ---
+        // d = (h_target - h_camera) / tan(mount_angle + ty)
         double targetHeightOffset = Constants.noteTargetHeight - Constants.limelightMountHeight;
-        double totalPitchRadians = Math.toRadians(Constants.limelightMountAngle + targetOffsetAngle_Vertical);
+        
+        // Ensure mountAngle is negative if pointing down, or handle signs appropriately
+        double totalPitchRadians = Math.toRadians(Constants.limelightMountAngle + ty);
+        
+        // Calculate ground distance
         double distanceToGoalX = targetHeightOffset / Math.tan(totalPitchRadians);
 
-        // 4. Calculate Horizontal Offset (Y)
-        // Formula: y = x * tan(tx)
-        double angleYawRadians = Math.toRadians(targetOffsetAngle_Horizontal);
-        double distanceToGoalY = distanceToGoalX * Math.tan(angleYawRadians);
+        // --- 2. Horizontal Offset (Y) ---
+        // y = x * tan(tx)
+        double distanceToGoalY = distanceToGoalX * Math.tan(Math.toRadians(tx));
 
-        // Calculate field-relative position
-        // Robot-relative: X is forward, Y is left.
-        // Limelight: +tx is right (negative Y), -tx is left (positive Y).
-        // So robot-relative Y = -distanceToGoalY (if distanceToGoalY is calculated from
-        // tx directly where +tx is right)
-
+        // --- 3. Robot-Relative Translation ---
+        // WPILib: +X is Forward, +Y is Left
+        // Limelight: +tx is Right. Therefore, Right = Negative Y
         Translation2d robotRelativeTranslation = new Translation2d(distanceToGoalX, -distanceToGoalY);
 
-        // Transform to field-relative
-        Pose2d currentRobotPose = robotPose; // Use the passed pose
-        // Rotate the robot-relative translation by the robot's heading
-        Translation2d fieldRelativeTranslation = currentRobotPose.getTranslation()
-                .plus(robotRelativeTranslation.rotateBy(currentRobotPose.getRotation()));
+        // --- 4. Field-Relative Transformation ---
+        // Rotate the robot-relative vector by the robot's heading, then add to robot's position
+        Translation2d fieldRelativeTranslation = robotPose.getTranslation()
+                .plus(robotRelativeTranslation.rotateBy(robotPose.getRotation()));
 
-        Pose2d targetPose = new Pose2d(fieldRelativeTranslation, new Rotation2d());
-
-        System.out.println("Vision: X=" + distanceToGoalX + ", Y=" + -distanceToGoalY + ", Pose=" + targetPose);
-
-        return targetPose;
+        return fieldRelativeTranslation;
     }
-
 }
