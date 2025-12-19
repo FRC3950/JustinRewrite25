@@ -40,8 +40,8 @@ public class Constants {
     public static final String limelightName = "limelight-notes";
     public static final double limelightMountHeight = Units.inchesToMeters(26.5); // Meters
     public static final double limelightMountAngle = -10.0; // Degrees (Angled down)
-    public static final double limelightMountXOffset = 0.0; // Meters (Forward/Back from center)
-    public static final double limelightMountYOffset = Units.inchesToMeters(-9.5); // Meters (Left/Right from center,
+    public static final double limelightMountXOffset = Units.inchesToMeters(-3); // Meters (Forward/Back from center)
+    public static final double limelightMountYOffset = Units.inchesToMeters(12); // Meters (Left/Right from center,
                                                                                    // -9.5 is Right)
     public static final double noteTargetHeight = Units.inchesToMeters(2); // Meters (on the floor)
 
