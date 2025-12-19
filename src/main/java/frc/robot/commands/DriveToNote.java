@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.VisionSubsystem;
+import edu.wpi.first.wpilibj.Timer;
 
 public class DriveToNote extends Command {
     private final CommandSwerveDrivetrain drivetrain;
@@ -26,7 +27,6 @@ public class DriveToNote extends Command {
     public DriveToNote(CommandSwerveDrivetrain drivetrain, VisionSubsystem vision) {
         this.drivetrain = drivetrain;
         this.vision = vision;
-        addRequirements(drivetrain);
 
         thetaController.enableContinuousInput(-Math.PI, Math.PI);
         xController.setTolerance(Constants.driveTolerance);
@@ -34,7 +34,7 @@ public class DriveToNote extends Command {
         thetaController.setTolerance(Constants.turnTolerance);
     }
 
-    private final edu.wpi.first.wpilibj.Timer timer = new edu.wpi.first.wpilibj.Timer();
+    private final Timer timer = new Timer();
     private static final double TIMEOUT = 3.0; // Seconds
 
     @Override

@@ -38,40 +38,34 @@ public class VisionSubsystem extends SubsystemBase {
         double targetOffsetAngle_Vertical = getTargetTy();
         double targetOffsetAngle_Horizontal = getTargetTx();
 
-        // Calculate distance
-        // Assuming limelightMountAngle is degrees down from horizontal
-        double angleToGoalDegrees = Constants.limelightMountAngle + targetOffsetAngle_Vertical;
-        double angleToGoalRadians = Math.toRadians(angleToGoalDegrees);
+        // 3. Calculate Forward Distance (X)
+        // Formula: d = (h_target - h_camera) / tan(mount_angle + ty)
+        double targetHeightOffset = Constants.noteTargetHeight - Constants.limelightMountHeight;
+        double totalPitchRadians = Math.toRadians(Constants.limelightMountAngle + targetOffsetAngle_Vertical);
+        double distanceToGoalX = targetHeightOffset / Math.tan(totalPitchRadians);
 
-        // d = (h_target - h_cam) / tan(angle)
-        double distanceFromLimelightToGoalMeters = (Constants.noteTargetHeight - Constants.limelightMountHeight)
-                / Math.tan(angleToGoalRadians);
-
-        // Add offset
-        distanceFromLimelightToGoalMeters += Constants.visionDistanceOffset;
+        // 4. Calculate Horizontal Offset (Y)
+        // Formula: y = x * tan(tx)
+        double angleYawRadians = Math.toRadians(targetOffsetAngle_Horizontal);
+        double distanceToGoalY = distanceToGoalX * Math.tan(angleYawRadians);
 
         // Calculate field-relative position
-        Rotation2d robotHeading = robotPose.getRotation();
-        Rotation2d angleToTarget = robotHeading.minus(Rotation2d.fromDegrees(targetOffsetAngle_Horizontal));
+        // Robot-relative: X is forward, Y is left.
+        // Limelight: +tx is right (negative Y), -tx is left (positive Y).
+        // So robot-relative Y = -distanceToGoalY (if distanceToGoalY is calculated from
+        // tx directly where +tx is right)
 
-        // Note: Limelight tx is negative when target is to the left, positive to the
-        // right.
-        // We need to add tx to robot heading to get angle to target?
-        // Let's verify: Robot at 0 deg. Target at -10 deg (left). Angle to target
-        // should be 10 deg left (positive or negative depending on coord system).
-        // CCW is positive. Left is positive Y.
-        // If robot is 0, and target is left, tx is negative? No, usually tx is negative
-        // left.
-        // Actually, let's use the Translation2d logic.
+        Translation2d robotRelativeTranslation = new Translation2d(distanceToGoalX, -distanceToGoalY);
 
-        Translation2d robotTranslation = robotPose.getTranslation();
-        Translation2d targetTranslation = robotTranslation.plus(new Translation2d(distanceFromLimelightToGoalMeters,
-                robotHeading.minus(Rotation2d.fromDegrees(targetOffsetAngle_Horizontal))));
+        // Transform to field-relative
+        Pose2d currentRobotPose = robotPose; // Use the passed pose
+        // Rotate the robot-relative translation by the robot's heading
+        Translation2d fieldRelativeTranslation = currentRobotPose.getTranslation()
+                .plus(robotRelativeTranslation.rotateBy(currentRobotPose.getRotation()));
 
-        Pose2d targetPose = new Pose2d(targetTranslation, new Rotation2d());
+        Pose2d targetPose = new Pose2d(fieldRelativeTranslation, new Rotation2d());
 
-        System.out.println("Vision: Dist=" + distanceFromLimelightToGoalMeters + "m, Angle=" + angleToGoalDegrees
-                + ", Pose=" + targetPose);
+        System.out.println("Vision: X=" + distanceToGoalX + ", Y=" + -distanceToGoalY + ", Pose=" + targetPose);
 
         return targetPose;
     }
