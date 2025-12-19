@@ -73,20 +73,39 @@ public class DriveToNote extends Command {
             return;
         }
 
-        // 3. Calculate dynamic rotation to face the note
+        // 3. Calculate dynamic rotation to face the BACK of the robot to the note
         // Vector from Robot -> Note
         Translation2d robotToNote = lastKnownTargetLocation.minus(currentPose.getTranslation());
-        Rotation2d desiredHeading = robotToNote.getAngle();
+        
+        // --- THE FIX IS HERE ---
+        // Get the angle to the note, then FLIP IT 180 degrees.
+        // This tells the Theta Controller to point the BACK of the robot at the target.
+        Rotation2d angleToNote = robotToNote.getAngle();
+        Rotation2d desiredHeading = angleToNote.plus(Rotation2d.fromDegrees(180));
 
-        // 4. Run PIDs
-        double xSpeed = xController.calculate(currentPose.getX(), lastKnownTargetLocation.getX());
-        double ySpeed = yController.calculate(currentPose.getY(), lastKnownTargetLocation.getY());
+        // 4. Calculate Distance Offset (Optional but Recommended)
+        // If your intake sticks out the back, you don't want to drive to the center of the note.
+        // You want to stop when the intake hits the note.
+        // Let's say your intake is 0.5 meters from the robot center.
+        // We move the target point "closer" to the robot by that offset.
+        // (Uncomment below if you want to stop early)
+        
+        // double intakeOffsetMeters = 0.5; 
+        // Translation2d offsetVector = new Translation2d(intakeOffsetMeters, angleToNote);
+        // Translation2d driveTarget = lastKnownTargetLocation.minus(offsetVector);
+        
+        // For now, let's just drive to the note center:
+        Translation2d driveTarget = lastKnownTargetLocation;
+
+        // 5. Run PIDs
+        double xSpeed = xController.calculate(currentPose.getX(), driveTarget.getX());
+        double ySpeed = yController.calculate(currentPose.getY(), driveTarget.getY());
         double thetaSpeed = thetaController.calculate(
             currentPose.getRotation().getRadians(), 
             desiredHeading.getRadians()
         );
 
-        // 5. Apply Control
+        // 6. Apply Control
         ChassisSpeeds fieldSpeeds = new ChassisSpeeds(xSpeed, ySpeed, thetaSpeed);
         ChassisSpeeds robotSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(fieldSpeeds, currentPose.getRotation());
 
