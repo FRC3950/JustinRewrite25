@@ -47,7 +47,11 @@ public class VisionSubsystem extends SubsystemBase {
         // --- 3. Robot-Relative Translation ---
         // WPILib: +X is Forward, +Y is Left
         // Limelight: +tx is Right. Therefore, Right = Negative Y
-        Translation2d robotRelativeTranslation = new Translation2d(distanceToGoalX, -distanceToGoalY);
+        Translation2d cameraToNote = new Translation2d(distanceToGoalX, -distanceToGoalY);
+        Translation2d robotToCamera = new Translation2d(Constants.limelightMountXOffset,
+                Constants.limelightMountYOffset);
+
+        Translation2d robotRelativeTranslation = robotToCamera.plus(cameraToNote);
 
         // --- 4. Field-Relative Transformation ---
         // Rotate the robot-relative vector by the robot's heading, then add to robot's
