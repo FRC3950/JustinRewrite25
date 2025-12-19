@@ -1,6 +1,8 @@
 package frc.robot.commands;
 
 import com.ctre.phoenix6.swerve.SwerveRequest;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -58,59 +60,42 @@ public class DriveToNote extends Command {
     }
 
     @Override
-    public void execute() {
-        Pose2d currentPose = drivetrain.getState().Pose;
+public void execute() {
+    Pose2d currentPose = drivetrain.getState().Pose;
 
-        // 1. Try to update target from Vision
-        Translation2d freshDetection = vision.getNoteFieldPosition(currentPose);
-        if (freshDetection != null) {
-            lastKnownTargetLocation = freshDetection;
-        }
-
-        // 2. If we still haven't seen a target ever, just stop.
-        if (lastKnownTargetLocation == null) {
-            drivetrain.setControl(new SwerveRequest.Idle());
-            return;
-        }
-
-        // 3. Calculate dynamic rotation to face the BACK of the robot to the note
-        // Vector from Robot -> Note
-        Translation2d robotToNote = lastKnownTargetLocation.minus(currentPose.getTranslation());
-        
-        // --- THE FIX IS HERE ---
-        // Get the angle to the note, then FLIP IT 180 degrees.
-        // This tells the Theta Controller to point the BACK of the robot at the target.
-        Rotation2d angleToNote = robotToNote.getAngle();
-        Rotation2d desiredHeading = angleToNote.plus(Rotation2d.fromDegrees(180));
-
-        // 4. Calculate Distance Offset (Optional but Recommended)
-        // If your intake sticks out the back, you don't want to drive to the center of the note.
-        // You want to stop when the intake hits the note.
-        // Let's say your intake is 0.5 meters from the robot center.
-        // We move the target point "closer" to the robot by that offset.
-        // (Uncomment below if you want to stop early)
-        
-        // double intakeOffsetMeters = 0.5; 
-        // Translation2d offsetVector = new Translation2d(intakeOffsetMeters, angleToNote);
-        // Translation2d driveTarget = lastKnownTargetLocation.minus(offsetVector);
-        
-        // For now, let's just drive to the note center:
-        Translation2d driveTarget = lastKnownTargetLocation;
-
-        // 5. Run PIDs
-        double xSpeed = xController.calculate(currentPose.getX(), driveTarget.getX());
-        double ySpeed = yController.calculate(currentPose.getY(), driveTarget.getY());
-        double thetaSpeed = thetaController.calculate(
-            currentPose.getRotation().getRadians(), 
-            desiredHeading.getRadians()
-        );
-
-        // 6. Apply Control
-        ChassisSpeeds fieldSpeeds = new ChassisSpeeds(xSpeed, ySpeed, thetaSpeed);
-        ChassisSpeeds robotSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(fieldSpeeds, currentPose.getRotation());
-
-        drivetrain.setControl(new SwerveRequest.ApplyRobotSpeeds().withSpeeds(robotSpeeds));
+    // 1. Update target from Vision
+    Translation2d freshDetection = vision.getNoteFieldPosition(currentPose);
+    if (freshDetection != null) {
+        lastKnownTargetLocation = freshDetection;
     }
+
+    if (lastKnownTargetLocation == null) {
+        drivetrain.setControl(new SwerveRequest.Idle());
+        return;
+    }
+
+    // 2. CALCULATE ROBOT-RELATIVE ERROR
+    // This transforms the Note's field position into "How many meters ahead/left of the robot"
+    Translation2d relativeTranslation = lastKnownTargetLocation.minus(currentPose.getTranslation())
+                                        .rotateBy(currentPose.getRotation().unaryMinus());
+
+    // 3. Calculate Rotation to face the BACK to the note
+    // We want the back of the robot (Angle PI) to face the relative translation
+    double angleToNote = Math.atan2(relativeTranslation.getY(), relativeTranslation.getX());
+    double rotationError = MathUtil.angleModulus(angleToNote - Math.PI);
+
+    // 4. GENERATE SPEEDS
+    // xSpeed: If relativeTranslation.getX() is positive, the note is in front. 
+    // Since we want to back into it, a positive error should result in a NEGATIVE xSpeed.
+    double xSpeed = xController.calculate(relativeTranslation.getX(), 0); 
+    double ySpeed = yController.calculate(relativeTranslation.getY(), 0);
+    double thetaSpeed = thetaController.calculate(rotationError, 0);
+
+    // 5. APPLY ROBOT-RELATIVE SPEEDS
+    // We use ApplyRobotSpeeds directly because our PIDs are now calculating robot-relative error
+    drivetrain.setControl(new SwerveRequest.ApplyRobotSpeeds()
+        .withSpeeds(new ChassisSpeeds(xSpeed, ySpeed, thetaSpeed)));
+}
 
     @Override
     public void end(boolean interrupted) {
