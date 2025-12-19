@@ -9,7 +9,8 @@ import frc.robot.LimelightHelpers;
 
 public class VisionSubsystem extends SubsystemBase {
 
-    public VisionSubsystem() {}
+    public VisionSubsystem() {
+    }
 
     public boolean hasTarget() {
         return LimelightHelpers.getTV(Constants.limelightName);
@@ -17,6 +18,7 @@ public class VisionSubsystem extends SubsystemBase {
 
     /**
      * Calculates the Field-Relative center point of the Note.
+     * 
      * @param robotPose The current pose of the robot from Odometry.
      * @return Translation2d location of the note, or null if no target.
      */
@@ -31,12 +33,12 @@ public class VisionSubsystem extends SubsystemBase {
         // --- 1. Distance Calculation (Forward/X) ---
         // d = (h_target - h_camera) / tan(mount_angle + ty)
         double targetHeightOffset = Constants.noteTargetHeight - Constants.limelightMountHeight;
-        
+
         // Ensure mountAngle is negative if pointing down, or handle signs appropriately
         double totalPitchRadians = Math.toRadians(Constants.limelightMountAngle + ty);
-        
+
         // Calculate ground distance
-        double distanceToGoalX = targetHeightOffset / Math.tan(totalPitchRadians);
+        double distanceToGoalX = Math.abs(targetHeightOffset / Math.tan(totalPitchRadians));
 
         // --- 2. Horizontal Offset (Y) ---
         // y = x * tan(tx)
@@ -48,7 +50,8 @@ public class VisionSubsystem extends SubsystemBase {
         Translation2d robotRelativeTranslation = new Translation2d(distanceToGoalX, -distanceToGoalY);
 
         // --- 4. Field-Relative Transformation ---
-        // Rotate the robot-relative vector by the robot's heading, then add to robot's position
+        // Rotate the robot-relative vector by the robot's heading, then add to robot's
+        // position
         Translation2d fieldRelativeTranslation = robotPose.getTranslation()
                 .plus(robotRelativeTranslation.rotateBy(robotPose.getRotation()));
 
