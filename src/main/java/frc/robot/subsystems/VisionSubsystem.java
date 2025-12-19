@@ -38,7 +38,7 @@ public class VisionSubsystem extends SubsystemBase {
         double totalPitchRadians = Math.toRadians(Constants.limelightMountAngle + ty);
 
         // Calculate ground distance
-        double distanceToGoalX = Math.abs(targetHeightOffset / Math.tan(totalPitchRadians));
+        double distanceToGoalX = -Math.abs(targetHeightOffset / Math.tan(totalPitchRadians));
 
         // --- 2. Horizontal Offset (Y) ---
         // y = x * tan(tx)
