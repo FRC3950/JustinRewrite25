@@ -64,13 +64,23 @@ public class DriveToNote extends Command {
 
     @Override
     public void execute() {
-        // If we didn't find a note at the start, just stop
+        Pose2d currentPose = drivetrain.getState().Pose;
+
+        // Update target if visible
+        Translation2d newTargetLocation = vision.getNoteFieldPosition(currentPose);
+        if (newTargetLocation != null) {
+            lockedTargetLocation = newTargetLocation;
+
+            // Recalculate rotation
+            Translation2d robotToNote = lockedTargetLocation.minus(currentPose.getTranslation());
+            lockedTargetRotation = robotToNote.getAngle().plus(Rotation2d.fromDegrees(180));
+        }
+
+        // If we still don't have a target (never saw one), stop
         if (lockedTargetLocation == null) {
             drivetrain.setControl(new SwerveRequest.Idle());
             return;
         }
-
-        Pose2d currentPose = drivetrain.getState().Pose;
 
         // Drive to the static Field-Relative position
         double xSpeed = xController.calculate(currentPose.getX(), lockedTargetLocation.getX());
