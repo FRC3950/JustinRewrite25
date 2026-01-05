@@ -216,7 +216,7 @@ public class RobotContainer {
                                                 ampCommand::isScheduled));
 
                 // Drive to Note
-                joystick.leftTrigger().whileTrue(new DriveToNote(drivetrain, vision));
+                joystick.leftTrigger().whileTrue(new DriveToNote(drivetrain, vision).alongWith(intake.intakeCommand()));
 
                 drivetrain.registerTelemetry(logger::telemeterize);
         }

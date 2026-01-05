@@ -46,9 +46,9 @@ public class Constants {
     public static final double noteTargetHeight = Units.inchesToMeters(2); // Meters (on the floor)
 
     // DriveToNote PID Constants
-    public static final double driveKP = 2.0;
+    public static final double driveKP = 1.25;
     public static final double driveKI = 0.0;
-    public static final double driveKD = 0.0;
+    public static final double driveKD = 0.05;
     public static final double turnKP = 2.0;
     public static final double turnKI = 0.0;
     public static final double turnKD = 0.0;
