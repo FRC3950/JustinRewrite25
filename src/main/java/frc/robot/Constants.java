@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.util.Units;
+
 /** Add your docs here. */
 public class Constants {
     public static double shooterSpeed = 70; // percent 0-100
@@ -33,4 +35,23 @@ public class Constants {
     public static final double driveSpeedIndoor = 4.3;
     public static final double driveSpeedOutdoor = 3.5;
     public static final double driveSpeedKid = 1.5;
+
+    // Vision Constants
+    public static final String limelightName = "limelight-notes";
+    public static final double limelightMountHeight = Units.inchesToMeters(26.5); // Meters
+    public static final double limelightMountAngle = -10.0; // Degrees (Angled down)
+    public static final double limelightMountXOffset = Units.inchesToMeters(-3); // Meters (Forward/Back from center)
+    public static final double limelightMountYOffset = Units.inchesToMeters(12); // Meters (Left/Right from center,
+                                                                                   // -9.5 is Right)
+    public static final double noteTargetHeight = Units.inchesToMeters(2); // Meters (on the floor)
+
+    // DriveToNote PID Constants
+    public static final double driveKP = 1.25;
+    public static final double driveKI = 0.0;
+    public static final double driveKD = 0.05;
+    public static final double turnKP = 2.0;
+    public static final double turnKI = 0.0;
+    public static final double turnKD = 0.0;
+    public static final double driveTolerance = 0.05; // Meters
+    public static final double turnTolerance = Units.degreesToRadians(3); // Radians
 }
